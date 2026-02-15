@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lì Xì 2026 - Minimal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        .lucky-box { transition: all 0.2s; }
+        .lucky-box:active { transform: scale(0.9); }
+        .opened { background-color: #f3f4f6 !important; color: #9ca3af !important; cursor: not-allowed; border: 1px dashed #d1d5db; box-shadow: none; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #fca5a5; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+
+    <div id="setup-screen" class="max-w-md mx-auto bg-white min-h-screen md:min-h-fit md:mt-10 p-8 md:rounded-3xl shadow-2xl">
+        <div class="text-center mb-8">
+            <span class="text-5xl">🧧</span>
+            <h2 class="text-2xl font-black text-red-600 mt-4">THIẾT LẬP LÌ XÌ</h2>
+        </div>
+        <div class="space-y-5">
+            <div>
+                <label class="text-xs font-bold uppercase text-slate-400 ml-1">Tổng ngân sách (VNĐ)</label>
+                <input type="number" id="total-budget" value="1000000" class="w-full bg-slate-100 border-none p-4 rounded-2xl focus:ring-2 focus:ring-red-500 outline-none text-lg font-semibold">
+            </div>
+            <div>
+                <label class="text-xs font-bold uppercase text-slate-400 ml-1">Số lượng phong bao</label>
+                <input type="number" id="total-packets" value="20" class="w-full bg-slate-100 border-none p-4 rounded-2xl focus:ring-2 focus:ring-red-500 outline-none text-lg font-semibold">
+            </div>
+            <button onclick="setupGame()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-red-200 hover:bg-red-700 active:scale-95 transition-all">BẮT ĐẦU NGAY</button>
+        </div>
+    </div>
+
+    <div id="play-screen" class="hidden max-w-4xl mx-auto p-4">
+        <div class="flex justify-between items-end mb-6">
+            <div>
+                <h1 class="text-3xl font-black text-red-600">LÌ XÌ 2026</h1>
+                <p class="text-slate-400 text-sm">Chạm vào một ô để nhận lộc</p>
+            </div>
+            <button onclick="resetGame()" class="text-xs text-slate-400 hover:text-red-500 font-medium">Làm mới từ đầu</button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2">
+                <div id="lucky-grid" class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3"></div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100">
+                    <h3 class="text-sm font-bold mb-4 flex items-center">
+                        <span class="mr-2">📊</span> CÒN LẠI TRONG KHO
+                    </h3>
+                    <div id="stats-list" class="grid grid-cols-2 gap-2 text-xs"></div>
+                </div>
+
+                <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-100">
+                    <h3 class="text-sm font-bold mb-4 flex items-center">
+                        <span class="mr-2">📜</span> LỊCH SỬ RÚT
+                    </h3>
+                    <div id="history-list" class="space-y-3 max-h-80 overflow-y-auto pr-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="name-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-white p-8 rounded-3xl w-full max-w-xs shadow-2xl transform transition-all">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">🧧</div>
+                <h3 class="font-bold text-xl">Ai đang bốc đó?</h3>
+            </div>
+            <input type="text" id="user-name" placeholder="Tên của bạn..." class="w-full bg-slate-100 border-none p-4 rounded-xl mb-3 focus:ring-2 focus:ring-red-500 outline-none text-center font-medium">
+            <button onclick="confirmPick()" class="w-full bg-red-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-red-200">MỞ BAO LÌ XÌ</button>
+            <button onclick="closeModal()" class="w-full mt-2 text-slate-400 text-sm py-2">Hủy</button>
+        </div>
+    </div>
+
+    <script>
+        let state = JSON.parse(localStorage.getItem('lixi_v2')) || null;
+        let pendingIdx = null;
+        const DENOMINATIONS = [500000, 200000, 100000, 50000, 20000, 10000, 5000, 2000, 1000];
+
+        function setupGame() {
+            const budget = parseInt(document.getElementById('total-budget').value);
+            const count = parseInt(document.getElementById('total-packets').value);
+            let packets = [];
+            let rem = budget;
+
+            // Thuật toán chia tiền thực tế
+            DENOMINATIONS.forEach((val) => {
+                let maxPossible = Math.floor(rem / val);
+                if (maxPossible > 0 && packets.length < count) {
+                    // Tỷ lệ: Mệnh giá lớn cực hiếm
+                    let chance = val >= 100000 ? 0.1 : 0.4;
+                    let num = Math.min(maxPossible, Math.ceil(Math.random() * (count * chance)));
+                    if (val === 1000) num = count - packets.length; // Fill nốt bao cuối
+
+                    for (let i = 0; i < num; i++) {
+                        if (packets.length < count) {
+                            packets.push(val);
+                            rem -= val;
+                        }
+                    }
+                }
+            });
+            
+            // Xáo trộn
+            packets.sort(() => Math.random() - 0.5);
+
+            state = {
+                packets: packets.map(v => ({ v, opened: false, user: '' })),
+                history: []
+            };
+            save();
+        }
+
+        function save() {
+            localStorage.setItem('lixi_v2', JSON.stringify(state));
+            render();
+        }
+
+        function render() {
+            if (!state) return;
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('play-screen').classList.remove('hidden');
+
+            // Render Lưới
+            const grid = document.getElementById('lucky-grid');
+            grid.innerHTML = state.packets.map((p, i) => `
+                <div onclick="openModal(${i})" class="lucky-box aspect-[3/4] rounded-xl flex items-center justify-center font-black text-xl shadow-sm cursor-pointer ${p.opened ? 'opened' : 'bg-red-500 text-white hover:bg-red-600'}">
+                    ${p.opened ? `<span class="text-[10px] text-center">${p.v.toLocaleString()}<br>đ</span>` : (i + 1)}
+                </div>
+            `).join('');
+
+            // Render Thống kê
+            const counts = {};
+            state.packets.filter(p => !p.opened).forEach(p => counts[p.v] = (counts[p.v] || 0) + 1);
+            const stats = document.getElementById('stats-list');
+            stats.innerHTML = DENOMINATIONS.filter(d => counts[d]).map(d => `
+                <div class="bg-slate-50 p-2 rounded-lg border border-slate-100 flex justify-between">
+                    <span class="font-bold text-red-600">${(d/1000)}k:</span>
+                    <span class="text-slate-500">${counts[d]} bao</span>
+                </div>
+            `).join('');
+
+            // Render Lịch sử
+            const hist = document.getElementById('history-list');
+            hist.innerHTML = state.history.slice().reverse().map(h => `
+                <div class="flex justify-between items-center text-sm bg-slate-50 p-3 rounded-xl">
+                    <span class="font-semibold">${h.user}</span>
+                    <span class="text-red-600 font-bold">+${h.v.toLocaleString()}đ</span>
+                </div>
+            `).join('');
+        }
+
+        function openModal(i) {
+            if (state.packets[i].opened) return;
+            pendingIdx = i;
+            document.getElementById('name-modal').classList.remove('hidden');
+            document.getElementById('user-name').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('name-modal').classList.add('hidden');
+        }
+
+        function confirmPick() {
+            const user = document.getElementById('user-name').value.trim();
+            if (!user) return alert("Cho xin cái tên nè!");
+
+            const p = state.packets[pendingIdx];
+            p.opened = true;
+            p.user = user;
+            state.history.push({ user, v: p.v });
+
+            // Hiệu ứng pháo hoa
+            if (p.v >= 50000) {
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff0000', '#ffd700'] });
+            } else {
+                confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } });
+            }
+
+            closeModal();
+            document.getElementById('user-name').value = '';
+            save();
+        }
+
+        function resetGame() {
+            if (confirm("Xóa lịch sử và thiết lập lại từ đầu?")) {
+                localStorage.removeItem('lixi_v2');
+                location.reload();
+            }
+        }
+
+        if (state) render();
+    </script>
+</body>
+</html>
