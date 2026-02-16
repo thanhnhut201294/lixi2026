@@ -3,21 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lì Xì 2026 - Check Nhân Phẩm</title>
+    <title>Lì Xì 2026 - Nhân Phẩm Ngũ Hành</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Montserrat', sans-serif; background: #7f1d1d; color: white; overflow-x: hidden; }
-        .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding: 40px; }
+        
+        /* Carousel: Tối ưu cho cả Mobile và PC */
+        .carousel-container { 
+            display: flex; 
+            overflow-x: auto; 
+            scroll-snap-type: x mandatory; 
+            gap: 15px; 
+            padding: 40px;
+            scroll-behavior: smooth;
+        }
         .carousel-container::-webkit-scrollbar { display: none; }
         
         .envelope-card {
-            flex: 0 0 80%; scroll-snap-align: center; aspect-ratio: 2/3.5;
-            border-radius: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4); transition: all 0.3s ease; position: relative;
+            flex: 0 0 80%; /* Mặc định Mobile */
+            scroll-snap-align: center; 
+            aspect-ratio: 2/3.5;
+            border-radius: 30px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4); 
+            transition: all 0.3s ease;
+            position: relative;
         }
-        @media (min-width: 768px) { .envelope-card { flex: 0 0 240px; } }
+
+        /* Fix giao diện PC: Thu nhỏ bao và căn giữa */
+        @media (min-width: 768px) { 
+            .envelope-card { flex: 0 0 200px; } 
+            .carousel-container { justify-content: center; padding: 40px 0; }
+        }
 
         /* Đặc trưng Ngũ Hành */
         .color-kim { background: radial-gradient(circle, #fff9c4, #fbc02d); color: #827717; border: 5px solid #fff; }
@@ -26,9 +48,14 @@
         .color-hoa { background: radial-gradient(circle, #ef9a9a, #c62828); color: white; border: 5px solid #e57373; }
         .color-tho { background: radial-gradient(circle, #bcaaa4, #4e342e); color: white; border: 5px solid #8d6e63; }
 
-        .symbol { font-size: 5rem; margin-bottom: 1rem; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2)); }
+        .symbol { font-size: 4rem; margin-bottom: 1rem; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2)); }
         .animate-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes pop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        
+        /* Hiệu ứng trượt cho PC */
+        @media (hover: hover) {
+            .envelope-card:hover { transform: translateY(-15px); cursor: pointer; }
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -36,18 +63,18 @@
     <div id="setup-screen" class="max-w-md mx-auto p-6 mt-4">
         <div class="bg-white text-slate-900 rounded-[2.5rem] p-8 shadow-2xl border-b-8 border-yellow-500">
             <h2 class="text-3xl font-black text-red-700 text-center mb-2 uppercase italic">LÌ XÌ 2026</h2>
-            <p class="text-center text-[10px] text-slate-400 mb-6 font-bold uppercase tracking-widest">Setup ví tiền của "đại gia"</p>
+            <p class="text-center text-[10px] text-slate-400 mb-6 font-bold uppercase tracking-widest">Thiết lập ví tiền của "Đại Gia"</p>
             
             <div id="setup-list" class="space-y-2 mb-6 max-h-[40vh] overflow-y-auto pr-2"></div>
 
-            <div class="bg-yellow-50 p-4 rounded-2xl mb-6 flex justify-between items-center border border-yellow-100 font-black">
-                <div class="text-center">
+            <div class="bg-yellow-50 p-4 rounded-2xl mb-6 flex justify-between items-center border border-yellow-100 font-black text-red-600">
+                <div class="text-center border-r border-yellow-200 pr-4 w-1/2">
                     <p class="text-[9px] uppercase text-yellow-600">Tổng túi</p>
-                    <p id="sum-count" class="text-xl text-red-600">0</p>
+                    <p id="sum-count" class="text-xl">0</p>
                 </div>
-                <div class="text-right">
+                <div class="text-center pl-4 w-1/2">
                     <p class="text-[9px] uppercase text-yellow-600">Sát thương ví</p>
-                    <p id="sum-money" class="text-xl text-red-600">0đ</p>
+                    <p id="sum-money" class="text-xl">0đ</p>
                 </div>
             </div>
 
@@ -58,7 +85,7 @@
     <div id="play-screen" class="hidden py-8">
         <div class="text-center mb-4 px-6">
             <h1 class="text-4xl font-black text-yellow-400 drop-shadow-md uppercase tracking-tighter italic">LÌ XÌ 2026</h1>
-            <p id="progress-info" class="text-white/60 text-[10px] uppercase font-bold mt-1">Đang chờ người có nhân phẩm cực cao...</p>
+            <p id="progress-info" class="text-white/60 text-[10px] uppercase font-bold mt-1">Đang tìm người có nhân phẩm hệ "Tâm Linh"...</p>
         </div>
 
         <div id="carousel" class="carousel-container mb-10"></div>
@@ -67,36 +94,42 @@
             ← Vuốt sang để tìm hệ phù hợp →
         </div>
 
-        <div class="px-6 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            <div class="bg-black/20 p-5 rounded-3xl border border-white/5">
-                <h3 class="text-[10px] font-black text-yellow-500 uppercase mb-3">Tình hình kho lộc</h3>
-                <div id="stats-list" class="grid grid-cols-3 gap-2"></div>
-            </div>
-            <div class="bg-black/20 p-5 rounded-3xl border border-white/5">
-                <h3 class="text-[10px] font-black text-yellow-500 uppercase mb-3">Bảng vàng nhân phẩm</h3>
-                <div id="history-list" class="space-y-2 max-h-32 overflow-y-auto pr-2 text-[10px]"></div>
-                <button onclick="resetGame()" class="mt-4 text-[8px] opacity-30 uppercase font-black underline">Reset cuộc đời</button>
+        <div class="px-6 max-w-5xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-black/20 backdrop-blur-md p-5 rounded-3xl border border-white/5">
+                    <h3 class="text-[10px] font-black text-yellow-500 uppercase mb-3 flex items-center">
+                        <span class="mr-2">💰</span> Tình hình kho lộc
+                    </h3>
+                    <div id="stats-list" class="grid grid-cols-3 gap-2"></div>
+                </div>
+                <div class="bg-black/20 backdrop-blur-md p-5 rounded-3xl border border-white/5">
+                    <h3 class="text-[10px] font-black text-yellow-500 uppercase mb-3 flex items-center">
+                        <span class="mr-2">📜</span> Bảng vàng nhân phẩm
+                    </h3>
+                    <div id="history-list" class="space-y-2 max-h-40 overflow-y-auto pr-2 text-[10px]"></div>
+                    <button onclick="resetGame()" class="mt-4 text-[8px] opacity-30 uppercase font-black underline hover:opacity-100">Reset cuộc đời</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="name-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-xl flex items-center justify-center p-6 z-50">
         <div class="bg-white text-slate-900 p-8 rounded-[2.5rem] w-full max-w-xs text-center shadow-2xl animate-pop">
-            <h3 class="font-black text-xl mb-4 text-red-600 uppercase italic">Xưng tên đi!</h3>
-            <p class="text-[10px] text-slate-400 mb-6 font-bold">Để hệ thống còn biết ai mà độ...</p>
+            <h3 class="font-black text-xl mb-4 text-red-600 uppercase italic">QUÝ DANH LÀ GÌ?</h3>
+            <p class="text-[10px] text-slate-400 mb-6 font-bold uppercase">Khai thật để hệ thống còn "độ"...</p>
             <input type="text" id="user-name" class="w-full bg-slate-100 p-5 rounded-2xl mb-4 text-center font-black text-xl outline-none focus:ring-4 focus:ring-red-200">
-            <button onclick="confirmPick()" class="w-full bg-red-600 text-white py-5 rounded-2xl font-black uppercase shadow-xl">RÚT LỘC NGAY!</button>
+            <button onclick="confirmPick()" class="w-full bg-red-600 text-white py-5 rounded-2xl font-black uppercase shadow-xl active:scale-95 transition-all">MỞ LỘC NGAY!</button>
         </div>
     </div>
 
-    <div id="result-modal" class="hidden fixed inset-0 bg-red-800/95 backdrop-blur-2xl flex items-center justify-center p-6 z-[60]">
+    <div id="result-modal" class="hidden fixed inset-0 bg-red-900/95 backdrop-blur-2xl flex items-center justify-center p-6 z-[60]">
         <div class="bg-white w-full max-w-sm rounded-[3rem] p-10 text-center shadow-2xl border-8 border-yellow-400 animate-pop">
-            <p id="wish-text" class="text-red-500 font-black text-xs uppercase mb-2 italic">LỜI CHÚC</p>
-            <h3 id="res-user" class="text-3xl font-black text-slate-900 mb-6 uppercase">USER</h3>
-            <div class="bg-red-600 py-10 rounded-[2rem] shadow-inner mb-6">
+            <p id="wish-text" class="text-red-500 font-black text-[10px] uppercase mb-2 italic">LỜI CHÚC</p>
+            <h3 id="res-user" class="text-3xl font-black text-slate-900 mb-6 uppercase tracking-tighter">USER</h3>
+            <div class="bg-red-600 py-10 rounded-[2.5rem] shadow-inner mb-6">
                 <span id="res-amount" class="text-5xl font-black text-yellow-400 tracking-tighter">0đ</span>
             </div>
-            <button onclick="closeResult()" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest text-sm">ĐA TẠ HỆ THỐNG!</button>
+            <button onclick="closeResult()" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest text-sm active:scale-90 transition-transform">XIN ĐA TẠ!</button>
         </div>
     </div>
 
@@ -110,12 +143,15 @@
             { name: 'THỔ', color: 'color-tho', symbol: '⛰️' }
         ];
         const WISHES = [
-            "Giàu sang bất thình lình!", "Nhân phẩm đỉnh của chóp!", "Tiền vào như nước sông Đà!", "Vẻ đẹp không lối thoát!",
-            "Tình duyên phơi phới!", "Cười tươi như hoa Tết!", "Ví dày như bánh chưng!", "Đẹp trai/xinh gái nhất vùng!",
-            "Lộc lá đầy mình luôn!", "Năm nay chỉ có đại gia!"
+            "Giàu sang bất thình lình!", "Nhân phẩm đỉnh của chóp!", "Tiền vào như nước sông Đà!", 
+            "Vẻ đẹp không lối thoát!", "Tình duyên phơi phới!", "Ví dày như bánh chưng!", 
+            "Đẹp trai nhất vùng!", "Xinh gái nhất phố!", "Năm nay làm đại gia!"
         ];
 
-        let state = JSON.parse(localStorage.getItem('lixi_2026_fun')) || null;
+        // Khởi tạo âm thanh xu rơi
+        const coinSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3');
+
+        let state = JSON.parse(localStorage.getItem('lixi_2026_final')) || null;
         let pendingIdx = null;
 
         const setupList = document.getElementById('setup-list');
@@ -124,9 +160,9 @@
                 <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
                     <span class="font-black text-slate-700 text-sm">${v.toLocaleString()}đ</span>
                     <div class="flex items-center gap-3">
-                        <button onclick="changeQty(${v}, -1)" class="w-8 h-8 bg-red-100 text-red-600 rounded-lg font-bold">-</button>
+                        <button onclick="changeQty(${v}, -1)" class="w-8 h-8 bg-red-100 text-red-600 rounded-lg font-bold hover:bg-red-200">-</button>
                         <input type="number" id="input-${v}" value="0" class="w-10 text-center font-black bg-transparent text-sm outline-none">
-                        <button onclick="changeQty(${v}, 1)" class="w-8 h-8 bg-red-100 text-red-600 rounded-lg font-bold">+</button>
+                        <button onclick="changeQty(${v}, 1)" class="w-8 h-8 bg-red-100 text-red-600 rounded-lg font-bold hover:bg-red-200">+</button>
                     </div>
                 </div>`;
         });
@@ -153,14 +189,14 @@
                 let q = parseInt(document.getElementById(`input-${v}`).value) || 0;
                 for(let n=0; n<q; n++) pkts.push(v);
             });
-            if(pkts.length === 0) return alert("Bỏ vốn ra đi bạn ơi, đừng bốc không!");
+            if(pkts.length === 0) return alert("Vui lòng nhập ít nhất 1 bao lì xì!");
             pkts.sort(() => Math.random() - 0.5);
             state = { pkts: pkts.map(v => ({ v, open: false, user: '' })), hist: [] };
             save();
         }
 
         function save() {
-            localStorage.setItem('lixi_2026_fun', JSON.stringify(state));
+            localStorage.setItem('lixi_2026_final', JSON.stringify(state));
             render();
         }
 
@@ -173,7 +209,7 @@
             const unopenIdxs = state.pkts.map((p, i) => p.open ? -1 : i).filter(i => i !== -1).slice(0, 5);
             
             if(unopenIdxs.length === 0) {
-                carousel.innerHTML = `<div class="w-full text-center py-10 font-black text-yellow-400">HẾT SẠCH LỘC RỒI, HẸN NĂM SAU!</div>`;
+                carousel.innerHTML = `<div class="w-full text-center py-20 font-black text-yellow-400 uppercase tracking-widest">HẾT SẠCH LỘC RỒI! HẸN NĂM SAU NHÉ!</div>`;
             } else {
                 carousel.innerHTML = unopenIdxs.map((realIdx, i) => {
                     const el = ELEMENTS[i % 5];
@@ -181,7 +217,7 @@
                     <div onclick="openModal(${realIdx})" class="envelope-card ${el.color}">
                         <div class="symbol">${el.symbol}</div>
                         <span class="font-black text-lg uppercase tracking-widest">${el.name}</span>
-                        <span class="text-[8px] font-bold mt-2 opacity-60">NHÂN PHẨM HỆ ${el.name}</span>
+                        <span class="text-[8px] font-bold mt-2 opacity-60 uppercase">Nhân Phẩm Hệ ${el.name}</span>
                     </div>`;
                 }).join('');
             }
@@ -197,18 +233,18 @@
                 </div>`).join('');
 
             document.getElementById('history-list').innerHTML = state.hist.slice().reverse().map(h => `
-                <div class="flex justify-between border-b border-white/5 pb-1">
-                    <span class="text-white/60">${h.user}</span>
+                <div class="flex justify-between border-b border-white/5 pb-1 mb-1 italic">
+                    <span class="text-white/60">${h.user.toUpperCase()}</span>
                     <span class="text-yellow-500 font-black">+${h.v.toLocaleString()}đ</span>
                 </div>`).join('');
         }
 
-        function openModal(i) { pendingIdx = i; document.getElementById('name-modal').classList.remove('hidden'); }
+        function openModal(i) { pendingIdx = i; document.getElementById('name-modal').classList.remove('hidden'); document.getElementById('user-name').focus(); }
         function closeModal() { document.getElementById('name-modal').classList.add('hidden'); }
 
         function confirmPick() {
             const user = document.getElementById('user-name').value.trim();
-            if(!user) return alert("Cho xin cái tên để hệ thống còn độ!");
+            if(!user) return alert("Vui lòng nhập tên để hệ thống còn biết ai mà độ!");
             const p = state.pkts[pendingIdx];
             p.open = true; p.user = user;
             state.hist.push({ user, v: p.v });
@@ -218,10 +254,15 @@
         }
 
         function showRes(user, v) {
-            document.getElementById('res-user').innerText = user;
+            // Phát âm thanh xu rơi
+            coinSound.play().catch(() => console.log("Cần tương tác với trình duyệt trước khi phát âm thanh."));
+
+            document.getElementById('res-user').innerText = user.toUpperCase();
             document.getElementById('res-amount').innerText = v.toLocaleString() + 'đ';
             document.getElementById('wish-text').innerText = WISHES[Math.floor(Math.random() * WISHES.length)];
             document.getElementById('result-modal').classList.remove('hidden');
+            
+            // Pháo hoa liên tục
             const end = Date.now() + 3000;
             (function f() {
                 confetti({ particleCount: 10, angle: 60, spread: 55, origin: { x: 0 }, colors:['#ff0000','#ffd700'] });
@@ -230,8 +271,13 @@
             }());
         }
 
-        function closeResult() { document.getElementById('result-modal').classList.add('hidden'); document.getElementById('user-name').value=''; }
-        function resetGame() { if(confirm("Muốn reset cuộc đời thật à?")) { localStorage.removeItem('lixi_2026_fun'); location.reload(); } }
+        function closeResult() { 
+            document.getElementById('result-modal').classList.add('hidden'); 
+            document.getElementById('user-name').value = '';
+            document.getElementById('carousel').scrollLeft = 0; // Reset carousel vị trí đầu
+        }
+        
+        function resetGame() { if(confirm("Xóa toàn bộ lịch sử và cài đặt lại cuộc đời mới?")) { localStorage.removeItem('lixi_2026_final'); location.reload(); } }
         if(state) render();
     </script>
 </body>
