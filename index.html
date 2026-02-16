@@ -3,197 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lì Xì 2026 - Ngũ Hành May Mắn</title>
+    <title>Lì Xì Bính Ngọ 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Montserrat', sans-serif; background: #0f172a; color: white; overflow-x: hidden; }
-        
-        /* Hiệu ứng mây chìm */
-        .bg-pattern {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('https://www.transparenttextures.com/patterns/oriental-tiles.png');
-            opacity: 0.1; pointer-events: none; z-index: 0;
+        body { font-family: 'Montserrat', sans-serif; }
+        .lucky-box { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .opened { background: #f1f5f9 !important; transform: scale(0.95); opacity: 0.7; pointer-events: none; border: 2px solid #e2e8f0; }
+        .result-gradient { background: radial-gradient(circle, #fff 0%, #fff5f5 100%); }
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
-
-        .swiper { width: 100%; padding-top: 40px; padding-bottom: 60px; }
-        
-        .swiper-slide {
-            width: 260px; height: 380px; border-radius: 24px;
-            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-            padding: 30px 20px; position: relative; transition: 0.5s;
-            border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        /* Định nghĩa màu sắc Ngũ Hành Cao Cấp */
-        .kim { background: linear-gradient(145deg, #fef3c7, #fbbf24); color: #78350f; box-shadow: 0 10px 30px -5px rgba(251, 191, 36, 0.4); }
-        .moc { background: linear-gradient(145deg, #dcfce7, #22c55e); color: #064e3b; box-shadow: 0 10px 30px -5px rgba(34, 197, 94, 0.4); }
-        .thuy { background: linear-gradient(145deg, #e0f2fe, #3b82f6); color: #1e3a8a; box-shadow: 0 10px 30px -5px rgba(59, 130, 246, 0.4); }
-        .hoa { background: linear-gradient(145deg, #fee2e2, #ef4444); color: #7f1d1d; box-shadow: 0 10px 30px -5px rgba(239, 68, 68, 0.4); }
-        .tho { background: linear-gradient(145deg, #f5f5f4, #78716c); color: #292524; box-shadow: 0 10px 30px -5px rgba(120, 113, 108, 0.4); }
-
-        .btn-open {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 12px 30px; border-radius: 99px; font-weight: 900;
-            transform: translateY(10px); opacity: 0; transition: 0.4s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        .swiper-slide-active .btn-open { transform: translateY(0); opacity: 1; }
-
-        .history-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+        .animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     </style>
 </head>
-<body>
-    <div class="bg-pattern"></div>
+<body class="bg-[#fdf2f2] min-h-screen text-slate-800">
 
-    <div id="setup-screen" class="relative z-10 max-w-md mx-auto p-6 min-h-screen flex flex-col justify-center">
-        <div class="text-center mb-8">
-            <h2 class="text-3xl font-black text-yellow-500 uppercase tracking-tighter">CÀI ĐẶT LÌ XÌ 2026</h2>
-            <p class="text-slate-400 text-sm">Nhập số lượng bao cho từng mệnh giá</p>
-        </div>
-        
-        <div id="denom-inputs" class="space-y-3 mb-6"></div>
-        
-        <div class="bg-slate-800/50 backdrop-blur p-5 rounded-3xl border border-slate-700">
-            <div class="flex justify-between items-center mb-2">
-                <span class="text-slate-400">Tổng ngân sách:</span>
-                <span id="total-money" class="text-xl font-black text-yellow-500">0đ</span>
+    <div id="setup-screen" class="max-w-md mx-auto min-h-screen flex items-center p-6">
+        <div class="bg-white w-full p-8 rounded-[2rem] shadow-2xl border-4 border-red-50">
+            <div class="text-center mb-8">
+                <div class="text-6xl mb-4">🧧</div>
+                <h2 class="text-2xl font-black text-red-600 uppercase tracking-tight">Cài Đặt Lì Xì</h2>
             </div>
-            <div class="text-xs text-slate-500 flex justify-between uppercase font-bold tracking-widest">
-                <span>Số lượng bao:</span>
-                <span id="total-count">0 bao</span>
+            <div class="space-y-4">
+                <input type="number" id="total-budget" value="1000000" placeholder="Tổng ngân sách" class="w-full bg-slate-100 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-red-500 font-bold">
+                <input type="number" id="total-packets" value="20" placeholder="Số bao" class="w-full bg-slate-100 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-red-500 font-bold">
+                <button onclick="setupGame()" class="w-full bg-red-600 text-white py-4 rounded-2xl font-black shadow-lg shadow-red-200 hover:scale-[1.02] active:scale-95 transition-all">BẮT ĐẦU CHƠI</button>
             </div>
-        </div>
-
-        <button onclick="startGame()" class="w-full mt-8 bg-gradient-to-r from-red-600 to-orange-600 text-white py-5 rounded-3xl font-black text-lg shadow-2xl shadow-red-900/40 hover:scale-[1.02] active:scale-95 transition-all uppercase">
-            BẮT ĐẦU NIÊM PHONG
-        </button>
-    </div>
-
-    <div id="play-screen" class="hidden relative z-10 min-h-screen flex flex-col items-center justify-between py-10 px-4">
-        <div class="text-center">
-            <h1 class="text-4xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-yellow-600 mb-1">LÌ XÌ 2026</h1>
-            <div id="rem-packets" class="bg-white/10 px-4 py-1 rounded-full text-[10px] uppercase font-bold tracking-widest inline-block text-yellow-500 border border-yellow-500/20">Còn lại: 0 bao</div>
-        </div>
-
-        <div class="swiper mySwiper">
-            <div class="swiper-wrapper">
-                <div class="swiper-slide kim"><div><p class="text-[10px] uppercase tracking-[0.3em] font-bold opacity-60">Ngũ Hành</p><p class="text-2xl font-black mt-1">KIM</p></div><div class="text-6xl">💎</div><button onclick="openModal()" class="btn-open">MỞ LỘC</button></div>
-                <div class="swiper-slide moc"><div><p class="text-[10px] uppercase tracking-[0.3em] font-bold opacity-60">Ngũ Hành</p><p class="text-2xl font-black mt-1">MỘC</p></div><div class="text-6xl">🌿</div><button onclick="openModal()" class="btn-open">MỞ LỘC</button></div>
-                <div class="swiper-slide thuy"><div><p class="text-[10px] uppercase tracking-[0.3em] font-bold opacity-60">Ngũ Hành</p><p class="text-2xl font-black mt-1">THỦY</p></div><div class="text-6xl">💧</div><button onclick="openModal()" class="btn-open">MỞ LỘC</button></div>
-                <div class="swiper-slide hoa"><div><p class="text-[10px] uppercase tracking-[0.3em] font-bold opacity-60">Ngũ Hành</p><p class="text-2xl font-black mt-1">HỎA</p></div><div class="text-6xl">🔥</div><button onclick="openModal()" class="btn-open">MỞ LỘC</button></div>
-                <div class="swiper-slide tho"><div><p class="text-[10px] uppercase tracking-[0.3em] font-bold opacity-60">Ngũ Hành</p><p class="text-2xl font-black mt-1">THỔ</p></div><div class="text-6xl">⛰️</div><button onclick="openModal()" class="btn-open">MỞ LỘC</button></div>
-            </div>
-        </div>
-
-        <div class="w-full max-w-sm px-4">
-            <h3 class="text-[10px] font-black text-slate-500 uppercase mb-4 tracking-[0.2em] text-center italic">Danh sách nhận lộc</h3>
-            <div id="history-list" class="space-y-2 max-h-48 overflow-y-auto pr-2"></div>
-            <button onclick="resetGame()" class="w-full mt-6 text-[10px] text-slate-600 uppercase font-bold hover:text-red-500 transition-colors">Thiết lập lại từ đầu</button>
         </div>
     </div>
 
-    <div id="name-modal" class="hidden fixed inset-0 bg-slate-950/90 flex items-center justify-center p-6 z-50 backdrop-blur-xl">
-        <div class="w-full max-w-xs text-center">
-            <div class="w-20 h-20 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-yellow-500/20 text-3xl">🧧</div>
-            <h3 class="text-2xl font-black text-white mb-2">DANH TÍNH</h3>
-            <p class="text-slate-400 text-sm mb-6 italic">Ghi danh để nhận lộc đầu xuân</p>
-            <input type="text" id="user-name" placeholder="Nhập tên..." class="w-full bg-slate-800 text-white border-2 border-slate-700 p-4 rounded-2xl mb-4 text-center focus:border-yellow-500 outline-none font-bold text-lg transition-all">
-            <button onclick="confirmPick()" class="w-full bg-yellow-500 text-slate-900 py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-yellow-400 transition-all uppercase tracking-tighter">XÁC NHẬN MỞ</button>
+    <div id="play-screen" class="hidden max-w-5xl mx-auto p-4 md:p-8">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <h1 class="text-3xl font-black text-red-600 italic tracking-tighter">BINH NGO 2026</h1>
+            <div class="flex gap-2">
+                <button onclick="resetGame()" class="bg-white px-4 py-2 rounded-full text-xs font-bold text-slate-400 hover:text-red-500 shadow-sm border border-slate-100">RESET ALL</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div class="lg:col-span-3">
+                <div id="lucky-grid" class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-3 md:gap-4"></div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-red-50">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 italic">Còn trong kho</h3>
+                    <div id="stats-list" class="space-y-2"></div>
+                </div>
+                <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-red-50">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 italic">Lịch sử</h3>
+                    <div id="history-list" class="space-y-3 max-h-60 overflow-y-auto pr-2"></div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <div id="name-modal" class="hidden fixed inset-0 bg-red-900/20 backdrop-blur-md flex items-center justify-center p-6 z-40">
+        <div class="bg-white p-8 rounded-[2.5rem] w-full max-w-xs shadow-2xl animate-pop">
+            <input type="text" id="user-name" placeholder="Tên của bạn..." class="w-full bg-slate-100 border-none p-5 rounded-2xl mb-4 focus:ring-2 focus:ring-red-500 outline-none text-center font-bold text-lg">
+            <button onclick="confirmPick()" class="w-full bg-red-600 text-white py-5 rounded-2xl font-black shadow-xl shadow-red-200 uppercase">Mở Lì Xì</button>
+            <button onclick="closeModal()" class="w-full mt-2 text-slate-400 text-xs font-bold py-2">QUAY LẠI</button>
+        </div>
+    </div>
+
+    <div id="result-modal" class="hidden fixed inset-0 bg-red-600/90 backdrop-blur-xl flex items-center justify-center p-6 z-50">
+        <div class="bg-white w-full max-w-sm rounded-[3rem] p-8 text-center shadow-2xl result-gradient animate-pop relative overflow-hidden">
+            <div class="relative z-10">
+                <p class="text-red-500 font-black text-sm uppercase tracking-[0.2em] mb-2">Chúc Mừng!</p>
+                <h3 id="result-user" class="text-2xl font-black mb-6">User Name</h3>
+                <div class="bg-red-50 py-8 rounded-3xl border-2 border-dashed border-red-200 mb-6">
+                    <span class="text-slate-400 text-xs font-bold block mb-1">BẠN ĐÃ NHẬN ĐƯỢC</span>
+                    <span id="result-amount" class="text-4xl font-black text-red-600 tracking-tighter">500.000đ</span>
+                </div>
+                <button onclick="closeResult()" class="w-full bg-black text-white py-5 rounded-2xl font-black uppercase tracking-widest text-sm active:scale-95 transition-transform">Tuyệt Vời!</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        const DENOMS = [500000, 200000, 100000, 50000, 20000, 10000];
-        let state = JSON.parse(localStorage.getItem('lixi_2026_final')) || null;
+        let state = JSON.parse(localStorage.getItem('lixi_final')) || null;
+        let pendingIdx = null;
+        const DENOMS = [500000, 200000, 100000, 50000, 20000, 10000, 5000, 2000, 1000];
 
-        const inputContainer = document.getElementById('denom-inputs');
-        DENOMS.forEach(d => {
-            const div = document.createElement('div');
-            div.className = "flex items-center justify-between p-4 bg-slate-800/40 border border-slate-700 rounded-2xl";
-            div.innerHTML = `<span class="font-bold text-slate-300 text-sm">${d.toLocaleString()}đ</span> 
-            <div class="flex items-center gap-2"><input type="number" data-val="${d}" value="0" oninput="calc()" class="denom-input w-16 bg-transparent text-right font-black text-yellow-500 outline-none text-lg"> <span class="text-slate-600 text-[10px] uppercase font-bold">Bao</span></div>`;
-            inputContainer.appendChild(div);
-        });
+        function setupGame() {
+            const budget = parseInt(document.getElementById('total-budget').value);
+            const count = parseInt(document.getElementById('total-packets').value);
+            let pkts = [];
+            let rem = budget;
 
-        function calc() {
-            let money = 0, count = 0;
-            document.querySelectorAll('.denom-input').forEach(i => {
-                const c = parseInt(i.value) || 0;
-                money += c * parseInt(i.dataset.val);
-                count += c;
+            DENOMS.forEach(v => {
+                let max = Math.floor(rem / v);
+                if (max > 0 && pkts.length < count) {
+                    let prob = v >= 100000 ? 0.05 : 0.3;
+                    let num = Math.min(max, Math.ceil(Math.random() * (count * prob)));
+                    if (v === 1000) num = count - pkts.length;
+                    for (let i = 0; i < num; i++) if (pkts.length < count) { pkts.push(v); rem -= v; }
+                }
             });
-            document.getElementById('total-money').innerText = money.toLocaleString() + 'đ';
-            document.getElementById('total-count').innerText = count + ' bao';
-        }
+            while(pkts.length < count) pkts.push(1000);
+            pkts.sort(() => Math.random() - 0.5);
 
-        function startGame() {
-            let pool = [];
-            document.querySelectorAll('.denom-input').forEach(i => {
-                const c = parseInt(i.value) || 0;
-                for(let j=0; j<c; j++) pool.push(parseInt(i.dataset.val));
-            });
-            if(pool.length === 0) return alert("Nhập ít nhất 1 bao!");
-            pool.sort(() => Math.random() - 0.5);
-            state = { pool, history: [] };
+            state = { pkts: pkts.map(v => ({ v, open: false, user: '' })), hist: [] };
             save();
         }
 
         function save() {
-            localStorage.setItem('lixi_2026_final', JSON.stringify(state));
+            localStorage.setItem('lixi_final', JSON.stringify(state));
             render();
         }
 
         function render() {
-            if(!state) return;
+            if (!state) return;
             document.getElementById('setup-screen').classList.add('hidden');
             document.getElementById('play-screen').classList.remove('hidden');
-            document.getElementById('rem-packets').innerText = `Còn lại: ${state.pool.length} bao`;
 
-            document.getElementById('history-list').innerHTML = state.history.slice().reverse().map(h => `
-                <div class="history-item flex justify-between p-3 rounded-xl text-xs mb-2 animate-fadeIn">
-                    <span class="font-bold text-slate-300">${h.name}</span>
-                    <span class="font-black text-yellow-500">+${h.v.toLocaleString()}đ</span>
+            const grid = document.getElementById('lucky-grid');
+            grid.innerHTML = state.pkts.map((p, i) => `
+                <div onclick="openPick(${i})" class="lucky-box aspect-[4/5] rounded-2xl md:rounded-[1.5rem] flex items-center justify-center font-black text-xl shadow-md cursor-pointer ${p.open ? 'opened' : 'bg-red-600 text-white hover:-translate-y-1 hover:shadow-red-200'}">
+                    ${p.open ? `<span class="text-[10px] text-slate-400 font-bold">${p.v/1000}K</span>` : (i + 1)}
+                </div>
+            `).join('');
+
+            const counts = {};
+            state.pkts.filter(p => !p.open).forEach(p => counts[p.v] = (counts[p.v] || 0) + 1);
+            document.getElementById('stats-list').innerHTML = DENOMS.filter(d => counts[d]).map(d => `
+                <div class="flex justify-between text-xs font-bold border-b border-slate-50 pb-2 mb-2">
+                    <span class="text-slate-400">${d.toLocaleString()}đ</span>
+                    <span class="text-red-600 bg-red-50 px-2 py-1 rounded-md">${counts[d]} bao</span>
+                </div>
+            `).join('');
+
+            document.getElementById('history-list').innerHTML = state.hist.slice().reverse().map(h => `
+                <div class="text-[10px] font-bold bg-slate-50 p-3 rounded-xl flex justify-between">
+                    <span>${h.user.toUpperCase()}</span>
+                    <span class="text-red-500">${h.v.toLocaleString()}đ</span>
                 </div>
             `).join('');
         }
 
-        const swiper = new Swiper(".mySwiper", {
-            effect: "coverflow",
-            grabCursor: true,
-            centeredSlides: true,
-            slidesPerView: "auto",
-            coverflowEffect: { rotate: 20, stretch: 0, depth: 150, modifier: 1, slideShadows: false },
-        });
-
-        function openModal() {
-            if(state.pool.length === 0) return alert("Hết lì xì rồi!");
+        function openPick(i) {
+            if (state.pkts[i].open) return;
+            pendingIdx = i;
             document.getElementById('name-modal').classList.remove('hidden');
         }
 
+        function closeModal() { document.getElementById('name-modal').classList.add('hidden'); }
+
         function confirmPick() {
-            const name = document.getElementById('user-name').value.trim();
-            if(!name) return alert("Vui lòng nhập tên!");
-            const value = state.pool.pop();
-            state.history.push({ name, v: value });
-            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#fbbf24', '#ef4444', '#ffffff'] });
-            alert(`🧧 Chúc mừng ${name} nhận được ${value.toLocaleString()}đ!`);
-            document.getElementById('name-modal').classList.add('hidden');
-            document.getElementById('user-name').value = '';
+            const user = document.getElementById('user-name').value.trim();
+            if (!user) return alert("Vui lòng nhập tên!");
+
+            const p = state.pkts[pendingIdx];
+            p.open = true;
+            p.user = user;
+            state.hist.push({ user, v: p.v });
+
+            closeModal();
+            showResult(user, p.v);
             save();
         }
 
-        function resetGame() {
-            if(confirm("Tết này chỉ chơi một lần, bạn có chắc muốn reset toàn bộ?")) {
-                localStorage.removeItem('lixi_2026_final');
-                location.reload();
-            }
+        function showResult(user, amount) {
+            document.getElementById('result-user').innerText = user;
+            document.getElementById('result-amount').innerText = amount.toLocaleString() + 'đ';
+            document.getElementById('result-modal').classList.remove('hidden');
+            
+            // Bắn pháo hoa liên tục 3 giây
+            const duration = 3 * 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff0000', '#ffd700'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff0000', '#ffd700'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
         }
-        if(state) render();
+
+        function closeResult() {
+            document.getElementById('result-modal').classList.add('hidden');
+            document.getElementById('user-name').value = '';
+        }
+
+        function resetGame() {
+            if (confirm("Reset toàn bộ?")) { localStorage.removeItem('lixi_final'); location.reload(); }
+        }
+
+        if (state) render();
     </script>
 </body>
 </html>
